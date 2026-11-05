@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Snackbot — a vending machine whose brain is a language model</title>
+<style>
+  :root { --bg:#0a0c14; --panel:#131725; --edge:#232842; --dim:#8b90b0; --txt:#e8ebf7;
+          --acc:#ffb86e; --bad:#ff8080; --good:#6ee7a0; --screen:#0d1a12; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:22px 16px 60px; background:var(--bg); color:var(--txt);
+         font:15px/1.6 system-ui,-apple-system,Segoe UI,sans-serif; }
+  .wrap { max-width:940px; margin:0 auto; }
+  h1 { font-size:22px; margin:0 0 6px; }
+  .sub { color:var(--dim); font-size:13px; margin-bottom:18px; }
+  .card { background:var(--panel); border:1px solid var(--edge); border-radius:14px; padding:16px; margin-bottom:14px; }
+  .layout { display:grid; grid-template-columns:1.05fr .95fr; gap:14px; align-items:start; }
+  @media (max-width:760px){ .layout{ grid-template-columns:1fr; } }
+  .machine { background:linear-gradient(160deg,#1a2038,#11141f); border:1px solid var(--edge);
+             border-radius:16px; padding:14px; }
+  .glass { background:#0e1220; border:1px solid #2b3157; border-radius:10px; padding:10px;
+           display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:12px; }
+  .slot { background:#141a2c; border:1px solid #262c4a; border-radius:8px; padding:6px 4px; text-align:center; font-size:11px; }
+  .slot .em { font-size:20px; display:block; line-height:1.3; }
+  .slot .st { color:var(--dim); }
+  .slot .pr { color:var(--acc); font-weight:700; }
+  .slot.out { opacity:.32; }
+  .screencase { background:#05070c; border:1px solid #2b3157; border-radius:10px; padding:10px; margin-bottom:12px; }
+  #screen { background:var(--screen); color:#8fe3a8; border-radius:6px; padding:10px 12px; min-height:78px;
+            font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; white-space:pre-wrap; }
+  .coins { display:flex; gap:8px; margin-bottom:10px; }
+  button { padding:10px 14px; border:0; border-radius:9px; background:#2a3154; color:#e8ebf7;
+           font-weight:600; font-size:13px; cursor:pointer; }
+  button:hover:not(:disabled) { background:#353d69; }
+  button:disabled { opacity:.45; cursor:default; }
+  button.buy { background:linear-gradient(135deg,#d97706,#f59e0b); color:#1a1206; }
+  .buttons { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .log { max-height:330px; overflow-y:auto; font-size:13px; }
+  .line { padding:7px 0; border-bottom:1px solid #1d2238; }
+  .line:last-child { border-bottom:0; }
+  .who { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dim); }
+  .you .say { color:#c8cde8; }
+  .bot .say { color:var(--acc); }
+  .state { font:12px/1.5 ui-monospace,monospace; color:var(--dim); white-space:pre-wrap; margin-top:8px; }
+  .hint { font-size:12px; color:var(--dim); margin-top:10px; }
+  .hint b { color:#b9bfdd; }
+  #status { font-size:13px; color:var(--dim); min-height:20px; margin-top:8px; }
+  #status.err { color:var(--bad); } #status.ok { color:var(--good); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Snackbot</h1>
+  <div class="sub">A vending machine whose entire brain is a language model. It keeps the stock, the credit and the change — and it decides what your button press actually does.</div>
+
+  <div class="layout">
+    <div>
+      <div class="machine">
+        <div class="glass" id="glass"></div>
+        <div class="screencase"><div id="screen">SNAK-BOT 4000&#10;READY. INSERT COIN.</div></div>
+        <div class="coins">
+          <button id="c1">Insert 1c</button>
+          <button id="c5">Insert 5c</button>
+          <button id="c10">Insert 10c</button>
+          <button id="coin" class="buy">Coin return</button>
+        </div>
+        <div class="buttons" id="buttons"></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <polli-connect app-key="pk_1G02HmEXYV7klCMM" budget="5" expiry="7" models="text"></polli-connect>
+        <div class="hint"><b>BYOP:</b> approve a scoped key (5 Pollen, 7 days). Every button press is one Pollinations call billed to <b>your</b> Pollen. Revoke any time.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="who">Machine log</div>
+      <div class="log" id="log"><div class="line bot"><div class="say">SNAK-BOT 4000 online. Stock loaded, coin box empty. Press something.</div></div></div>
+      <div class="who" style="margin-top:12px">State the model is holding</div>
+      <div class="state" id="state">-</div>
+      <div id="status"></div>
+      <div class="hint">Reset the machine if it jams. The model keeps state in its own output, so a jam is part of the game, not a bug in the page.</div>
+      <button id="reset" style="margin-top:10px">Reset machine</button>
+    </div>
+  </div>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/@pollinations/ui@0.1.0-alpha.20/dist/connect.js"></script>
+<script src="pollinations-client.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
